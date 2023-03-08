@@ -1,0 +1,17 @@
+{
+  "name": "lockpick-shiv-swapper",
+  "version-string": "1.0.0",
+  "description": "Lockpick Shiv Swapper",
+  "homepage": "",
+  "license": "MIT",
+  "dependencies": [
+    "boost-stl-interfaces",
+    "clib-util",
+    "mergemapper",
+    "rsm-binary-io",
+    "spdlog",
+    "srell",
+    "unordered-dense",
+    "xbyak"
+  ]
+}
