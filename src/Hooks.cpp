@@ -1,7 +1,7 @@
 #include "Hooks.h"
 #include "AttachManager.h"
-#include "Settings.h"
 #include "RE.h"
+#include "Settings.h"
 
 namespace Hooks
 {
@@ -35,14 +35,16 @@ namespace Hooks
 		{
 			if (!func(a_this, a_event)) {
 				const auto settings = Settings::GetSingleton();
-			    const auto key = a_event->GetIDCode();
+
+				const auto key = a_event->GetIDCode();
+				const auto device = a_event->GetDevice();
 
 				if (a_event->IsHeld()) {
 					if (key == settings->editor.altActionKey) {
 						isAltKeyHeld = true;
 					}
 					if (numTimesTogglePressed == 1) {
-						AttachManager::GetSingleton()->ProcessButtonHeld(key, isAltKeyHeld);
+						AttachManager::GetSingleton()->ProcessButtonHeld(device, key, isAltKeyHeld);
 					}
 				} else if (a_event->IsDown()) {
 					if (key == settings->editor.toggleKey) {
@@ -62,7 +64,7 @@ namespace Hooks
 						}
 					}
 					if (numTimesTogglePressed == 1) {
-						AttachManager::GetSingleton()->ProcessButtonDown(key, isAltKeyHeld);
+						AttachManager::GetSingleton()->ProcessButtonDown(device, key, isAltKeyHeld);
 					}
 				} else if (a_event->IsUp()) {
 					if (key == settings->editor.altActionKey) {
@@ -85,7 +87,7 @@ namespace Hooks
 				return;
 			}
 
-		    if (const auto shadowSceneNode = RE::UI3DSceneManager::GetSingleton()->shadowSceneNode) {
+			if (const auto shadowSceneNode = RE::UI3DSceneManager::GetSingleton()->shadowSceneNode) {
 				for (const auto& light : shadowSceneNode->activeLights) {
 					if (light && light->light) {
 						if (a_boost) {

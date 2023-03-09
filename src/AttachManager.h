@@ -5,8 +5,8 @@ class AttachManager : public ISingleton<AttachManager>
 public:
 	void LoadPresets();
 
-	void ProcessButtonHeld(std::uint32_t a_key, bool a_altKeyHeld) const;
-	void ProcessButtonDown(std::uint32_t a_key, bool a_altKeyHeld);
+	void ProcessButtonHeld(RE::INPUT_DEVICE a_device, std::uint32_t a_key, bool a_altKeyHeld) const;
+	void ProcessButtonDown(RE::INPUT_DEVICE a_device, std::uint32_t a_key, bool a_altKeyHeld);
 
 	void TryAttachModel(const RE::NiPointer<RE::NiNode>& a_shivNode);
 	void ClearModels();

@@ -40,9 +40,9 @@ public:
 			{ KEY_BIND::kX_Down, RE::BSKeyboardDevice::Key::kUp },
 			{ KEY_BIND::kZ_Up, RE::BSKeyboardDevice::Key::kRight },
 			{ KEY_BIND::kZ_Down, RE::BSKeyboardDevice::Key::kLeft },
-			{ KEY_BIND::kFlip, RE::BSWin32MouseDevice::Key::kButton3 },
-			{ KEY_BIND::kScaleUp, RE::BSWin32MouseDevice::Key::kWheelUp },
-			{ KEY_BIND::kScaleDown, RE::BSWin32MouseDevice::Key::kWheelDown },
+			{ KEY_BIND::kFlip, RE::BSWin32MouseDevice::Key::kButton3 + 256 },
+			{ KEY_BIND::kScaleUp, RE::BSWin32MouseDevice::Key::kWheelUp + 256 },
+			{ KEY_BIND::kScaleDown, RE::BSWin32MouseDevice::Key::kWheelDown + 256 },
 			{ KEY_BIND::kSavePreset, RE::BSKeyboardDevice::Key::kEnter },
 			{ KEY_BIND::kReloadPreset, RE::BSKeyboardDevice::Key::kR }
 		};
