@@ -350,7 +350,6 @@ void AttachManager::TryAttachModel(const RE::NiPointer<RE::NiNode>& a_shivNode)
 	}
 	if (dagger) {
 		if (auto model = dagger->GetModel(); !string::is_empty(model)) {
-			daggersTransforms[model] = { "test", RE::NiTransform() };
 			if (const auto error = AttachModel(model, daggersTransforms[model], a_shivNode); error != RE::BSResource::ErrorCode::kNone) {
 				logger::info("failed to load {} [{}]", model, stl::to_underlying(error));
 			}
