@@ -16,8 +16,8 @@ void Settings::LoadSettings()
 	ini::get_value(ini, editor.moveAmount, "TransformEditor", "MoveAmount", "; ");
 	ini::get_value(ini, editor.scaleAmount, "TransformEditor", "ScaleAmount", nullptr);
 
-	ini::get_value(ini, editor.toggleKey, "TransformEditorKeyBinds", "ToggleKey", ";DXScanCodes : https://www.creationkit.com/index.php?title=Input_Script\n\n;Toggle transform editor. Set this to 0 to disable it. Default key : LeftAlt");
-	ini::get_value(ini, editor.toggleKey, "TransformEditorKeyBinds", "AltActionKey", ";Default key : LeftShift");
+	ini::get_value(ini, editor.toggleKey, "TransformEditorKeyBinds", "ToggleKey", ";DXScanCodes : https://www.creationkit.com/index.php?title=Input_Script\n\n;Toggle transform editor. Set this to 0 to disable it. Default key : T");
+	ini::get_value(ini, editor.altActionKey, "TransformEditorKeyBinds", "AltActionKey", ";Default key : LeftShift");
 
 	editor.assign_keybind(ini, KEY_BIND::kX_Up, "TransformEditorKeyBinds", "MoveXUp", ";Hold alt action key to move in Y axis. Default key : Down");
 	editor.assign_keybind(ini, KEY_BIND::kX_Down, "TransformEditorKeyBinds", "MoveXDown", ";Hold alt action key to move in Y axis. ;Default key : Up");

@@ -32,7 +32,7 @@ public:
 			keyBinds.assign(a_keyBind, value);
 		}
 
-		std::uint32_t toggleKey{ RE::BSKeyboardDevice::Key::kLeftAlt };
+		std::uint32_t toggleKey{ RE::BSKeyboardDevice::Key::kT };
 		std::uint32_t altActionKey{ RE::BSKeyboardDevice::Key::kLeftShift };
 
 		BiMap<KEY_BIND, std::uint32_t> keyBinds{

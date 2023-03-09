@@ -135,7 +135,7 @@ void AttachManager::ProcessButtonDown(RE::INPUT_DEVICE a_device, std::uint32_t a
 
 	switch (a_device) {
 	case RE::INPUT_DEVICE::kMouse:
-		a_key += 256;
+		a_key += SKSE::InputMap::kMacro_MouseButtonOffset;
 		break;
 	case RE::INPUT_DEVICE::kGamepad:
 		a_key = SKSE::InputMap::GamepadMaskToKeycode(a_key);
