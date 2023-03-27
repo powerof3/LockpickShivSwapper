@@ -316,7 +316,7 @@ void ModelManager::ProcessModel(const RE::NiNodePtr& loadedNode)
 
 void ModelManager::ClearModels()
 {
-	PresetManager::GetSingleton()->Clear();
+	PresetManager::GetSingleton()->ClearCurrentData();
 
 	RE::DetachNode(modelHolder);
 
@@ -324,6 +324,5 @@ void ModelManager::ClearModels()
 		CullDagger(false);
 		daggerNodeName.clear();
 	}
-
 	typeDagger = false;
 }

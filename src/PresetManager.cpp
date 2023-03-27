@@ -149,8 +149,6 @@ void PresetManager::LoadPresets()
 		ini.GetAllSections(sections);
 		sections.sort(CSimpleIniA::Entry::LoadOrder());
 
-		static constexpr srell::regex transformRegex{ R"(^([-+]?\d*\.\d+),([-+]?\d*\.\d+),([-+]?\d*\.\d+)$)" };
-
 		for (auto& [section, comment, keyOrder] : sections) {
 			RE::NiTransform transform{};
 
@@ -253,11 +251,10 @@ void PresetManager::WritePreset(const RE::NiTransform& a_transform)
 	(void)ini.SaveFile(presetPath.data());
 }
 
-void PresetManager::Clear()
+void PresetManager::ClearCurrentData()
 {
 	modelPath.clear();
 	presetPath.clear();
 	truncPresetPath.clear();
-
 	isDagger = false;
 }

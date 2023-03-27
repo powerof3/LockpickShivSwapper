@@ -1,5 +1,5 @@
 #include "Hooks.h"
-#include "AttachManager.h"
+#include "ModelManager.h"
 #include "Settings.h"
 
 namespace Hooks
@@ -19,7 +19,7 @@ namespace Hooks
 				const auto lockModel = lockModelHandle ? lockModelHandle->data : RE::NiPointer<RE::NiNode>();
 
 				if (const auto shivNode = RE::NiPointer(lockModel ? lockModel->GetObjectByName("Shiv")->AsNode() : nullptr)) {
-					AttachManager::GetSingleton()->TryAttachModel(shivNode);
+					ModelManager::GetSingleton()->TryAttachModel(shivNode);
 				}
 
 				a_this->init3DElements = true;
@@ -43,7 +43,7 @@ namespace Hooks
 						isAltKeyHeld = true;
 					}
 					if (numTimesTogglePressed == 1) {
-						AttachManager::GetSingleton()->ProcessButtonHeld(device, key, isAltKeyHeld);
+						ModelManager::GetSingleton()->ProcessButtonHeld(device, key, isAltKeyHeld);
 					}
 				} else if (a_event->IsDown()) {
 					if (key == settings->editor.toggleKey) {
@@ -63,7 +63,7 @@ namespace Hooks
 						}
 					}
 					if (numTimesTogglePressed == 1) {
-						AttachManager::GetSingleton()->ProcessButtonDown(device, key, isAltKeyHeld);
+						ModelManager::GetSingleton()->ProcessButtonDown(device, key, isAltKeyHeld);
 					}
 				} else if (a_event->IsUp()) {
 					if (key == settings->editor.altActionKey) {
@@ -108,7 +108,7 @@ namespace Hooks
 			isAltKeyHeld = false;
 			numTimesTogglePressed = 0;
 
-			AttachManager::GetSingleton()->ClearModels();
+			ModelManager::GetSingleton()->ClearModels();
 
 			func(a_this, a_object);
 		}

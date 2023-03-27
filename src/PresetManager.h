@@ -25,14 +25,14 @@ public:
 	void WritePreset(const RE::NiTransform& a_transform);
 	void LogAction(std::string_view a_action) const;
 
-	void Clear();
+	void ClearCurrentData();
 
 private:
 	struct Dagger
 	{
 		static inline constexpr std::string_view defaultPreset{ R"(Data\ShivSwapper\DefaultPreset.ini)" };
 
-	    static RE::TESObjectWEAP* GetRandom();
+		static RE::TESObjectWEAP* GetRandom();
 		static RE::TESObjectWEAP* GetEquipped();
 		static RE::TESObjectWEAP* GetBest();
 
@@ -41,15 +41,16 @@ private:
 	};
 
 	// members
-	std::string presetPath;
-	std::string truncPresetPath;
-	std::string modelPath;
-
-	bool isDagger{ false };
-
 	StringMap<ModelData> daggersMap{};
 	StringMap<ModelData> modelMap{};
 
+	std::string presetPath;
+	std::string truncPresetPath;
+	std::string modelPath;
+	bool        isDagger{ false };
+
 	static inline constexpr std::string_view daggerEntry{ "DAGGER|" };
 	static inline constexpr std::string_view modelEntry{ "MODEL|" };
+
+	static inline srell::regex transformRegex{ R"(^([-+]?\d*\.\d+),([-+]?\d*\.\d+),([-+]?\d*\.\d+)$)" };
 };
