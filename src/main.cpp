@@ -1,6 +1,6 @@
-#include "AttachManager.h"
-#include "Settings.h"
 #include "Hooks.h"
+#include "PresetManager.h"
+#include "Settings.h"
 
 void MessageHandler(SKSE::MessagingInterface::Message* a_message)
 {
@@ -8,8 +8,8 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_message)
 	case SKSE::MessagingInterface::kPostLoad:
 		{
 			Settings::GetSingleton()->LoadSettings();
-	        logger::info("{:*^30}", "PRESETS");
-			AttachManager::GetSingleton()->LoadPresets();
+			logger::info("{:*^30}", "PRESETS");
+			PresetManager::GetSingleton()->LoadPresets();
 			logger::info("{:*^30}", "HOOKS");
 			Hooks::Install();
 		}
@@ -24,6 +24,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_message)
 			} else {
 				logger::info("MergeMapper not detected");
 			}
+			logger::info("{:*^30}", "GAME");
 		}
 		break;
 	default:
@@ -35,7 +36,7 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_message)
 extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 	SKSE::PluginVersionData v;
 	v.PluginVersion(Version::MAJOR);
-	v.PluginName("Lock Variations");
+	v.PluginName("Lockpick Shiv Swapper");
 	v.AuthorName("powerofthree");
 	v.UsesAddressLibrary();
 	v.UsesNoStructs();
@@ -47,7 +48,7 @@ extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name = "Lock Variations";
+	a_info->name = "Lockpick Shiv Swapper";
 	a_info->version = Version::MAJOR;
 
 	if (a_skse->IsEditor()) {

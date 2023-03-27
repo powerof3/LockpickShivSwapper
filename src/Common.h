@@ -1,8 +1,5 @@
 #pragma once
 
-template <class K, class D>
-using Map = ankerl::unordered_dense::map<K, D>;
-
 struct string_hash
 {
 	using is_transparent = void;  // enable heterogeneous overloads
@@ -18,6 +15,10 @@ template <class D>
 using StringMap = ankerl::unordered_dense::map<std::string, D, string_hash, std::equal_to<>>;
 using StringSet = ankerl::unordered_dense::set<std::string, string_hash, std::equal_to<>>;
 
+template <class K, class D>
+using Map = ankerl::unordered_dense::map<K, D>;
+
+// bidirectional map
 template <class K, class V>
 class BiMap
 {
@@ -30,7 +31,8 @@ public:
 		}
 	}
 
-	bool assign(const K& key, const V& value)
+	// update both keys and values
+    bool assign(const K& key, const V& value)
 	{
 		if (auto fIt = _forward.find(key); fIt != _forward.end()) {
 			if (auto rIt = _reverse.find(fIt->second); rIt != _reverse.end()) {
@@ -45,12 +47,14 @@ public:
 		return false;
 	}
 
-	const V& value(const K& key) const
+	// get value for key
+    const V& value(const K& key) const
 	{
 		return _forward.at(key);
 	}
 
-	std::optional<K> key(const V& value) const
+	// get key for a value
+    std::optional<K> key(const V& value) const
 	{
 		auto it = _reverse.find(value);
 		if (it != _reverse.end()) {
@@ -63,23 +67,4 @@ public:
 private:
 	Map<K, V> _forward;
 	Map<V, K> _reverse;
-};
-
-template <class T>
-class ISingleton
-{
-public:
-	static T* GetSingleton()
-	{
-		static T singleton;
-		return std::addressof(singleton);
-	}
-protected:
-	ISingleton() = default;
-	~ISingleton() = default;
-
-	ISingleton(const ISingleton&) = delete;
-	ISingleton(ISingleton&&) = delete;
-	ISingleton& operator=(const ISingleton&) = delete;
-	ISingleton& operator=(ISingleton&&) = delete;
 };

@@ -1,11 +1,15 @@
 #pragma once
 
+struct ModelData;
+
 class ModelManager : public ISingleton<ModelManager>
 {
 public:
-	void            ProcessModel(const RE::NiPointer<RE::NiNode>& originalNode, const RE::NiPointer<RE::NiNode>& a_newNode);
-	RE::NiTransform CalculateBestLockAlignment();
-	void            Clear();
+	void ProcessButtonHeld(RE::INPUT_DEVICE a_device, std::uint32_t a_key, bool a_altKeyHeld) const;
+	void ProcessButtonDown(RE::INPUT_DEVICE a_device, std::uint32_t a_key, bool a_altKeyHeld);
+
+	void TryAttachModel(const RE::NiPointer<RE::NiNode>& a_shivNode);
+	void ClearModels();
 
 private:
 	// pre-calculated values for vanilla lockpick shiv
@@ -15,11 +19,25 @@ private:
 		static inline constexpr RE::NiPoint3 startPoint{ 0.649953f, 6.23654f, 1.74555f };
 	};
 
-	RE::NiBound         GetMinimalEnclosingSphere();
-	static RE::NiPoint3 FindMidPoint(const RE::NiBound& a_minimalEnclosingSphere);
-	static RE::NiPoint3 FindStartPoint(const RE::NiBound& a_minimalEnclosingSphere, const RE::NiPoint3& a_offset);
+	void        ReadPreset() const;
+	void        WritePreset() const;
+	static void LogAction(std::string_view a_action);
+
+	void         GetMinimalEnclosingSphere(const std::vector<RE::NiBound>& a_boundingSpheres);
+	RE::NiPoint3 FindStartPoint(const RE::NiPoint3& a_offset);
+	RE::NiPoint3 FindMidPoint();
+	void         CalculateLockAlignment(bool a_serialize);
+
+	void ProcessModel(const RE::NiNodePtr& loadedNode);
+	bool AttachModel(const RE::NiNodePtr& a_shivNode, const RE::NiNodePtr& a_loadedModel, const std::optional<ModelData>& a_modelData);
+
+	void CullDagger(bool a_cull) const;
 
 	// members
-	std::vector<RE::NiBound> boundingSpheres{};
-	RE::NiBound              minimalEnclosingSphere{};
+	RE::NiPointer<RE::NiNode> modelHolder{};
+	RE::NiBound               minimalEnclosingSphere{};
+	RE::NiTransform           bestLockAlignment{};
+
+	bool        typeDagger{ false };
+	std::string daggerNodeName{};
 };

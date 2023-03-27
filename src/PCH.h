@@ -12,6 +12,7 @@
 #include <ClibUtil/numeric.hpp>
 #include <ClibUtil/simpleINI.hpp>
 #include <ClibUtil/string.hpp>
+#include <ClibUtil/singleton.hpp>
 #include <MergeMapperPluginAPI.h>
 #include <ankerl/unordered_dense.h>
 #include <spdlog/sinks/basic_file_sink.h>
@@ -28,6 +29,7 @@ namespace ini = clib_util::ini;
 
 using namespace std::literals;
 using namespace string::literals;
+using namespace clib_util::singleton;
 
 namespace stl
 {
@@ -62,3 +64,4 @@ namespace stl
 
 #include "Common.h"
 #include "Version.h"
+#include "RE.h"

@@ -11,6 +11,7 @@ void Settings::LoadSettings()
 
 	ini::get_value(ini, enableDaggerSwap, "Dagger", "Enable", ";Switch out vanilla shiv for a dagger in your inventory");
 	ini::get_value(ini, useHighestAvailableDagger, "Dagger", "UseHighestDamageDagger", ";If false, use the lowest damage dagger available");
+	ini::get_value(ini, hideEquippedDagger, "Dagger", "HideEquippedDagger", ";Hide equipped dagger in hand when using it to lockpick");
 
 	ini::get_value(ini, editor.boostLightingInEditor, "TransformEditor", "BoostLighting", ";Edit model position,scale,rotation in-game\n\n;Increase light intensity in edit mode");
 	ini::get_value(ini, editor.moveAmount, "TransformEditor", "MoveAmount", "; ");

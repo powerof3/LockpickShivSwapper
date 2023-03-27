@@ -1,6 +1,5 @@
 #include "Hooks.h"
 #include "AttachManager.h"
-#include "RE.h"
 #include "Settings.h"
 
 namespace Hooks
@@ -102,16 +101,16 @@ namespace Hooks
 	};
 
 	// Clear
-	struct PopLightingScheme
+	struct ClearMenuObject
 	{
-		static void thunk(RE::UI3DSceneManager* a_this, RE::INTERFACE_LIGHT_SCHEME a_scheme)
+		static void thunk(RE::UI3DSceneManager* a_this, RE::NiNode* a_object)
 		{
 			isAltKeyHeld = false;
 			numTimesTogglePressed = 0;
 
 			AttachManager::GetSingleton()->ClearModels();
 
-			func(a_this, a_scheme);
+			func(a_this, a_object);
 		}
 		static inline REL::Relocation<decltype(thunk)> func;
 	};
@@ -127,7 +126,7 @@ namespace Hooks
 
 		stl::write_vfunc<RE::LockpickingMenu, ProcessButton>();
 
-		REL::Relocation<std::uintptr_t> cleanup_menu{ RELOCATION_ID(51082, 51961), 0x98 };
-		stl::write_thunk_call<PopLightingScheme>(cleanup_menu.address());
+		REL::Relocation<std::uintptr_t> cleanup_menu{ RELOCATION_ID(51082, 51961), 0x77 };
+		stl::write_thunk_call<ClearMenuObject>(cleanup_menu.address());
 	}
 }

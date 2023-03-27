@@ -21,6 +21,7 @@ public:
 	// members
 	bool enableDaggerSwap{ true };
 	bool useHighestAvailableDagger{ true };
+	bool hideEquippedDagger{ true };
 
 	struct
 	{
