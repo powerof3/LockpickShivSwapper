@@ -1,21 +1,21 @@
 #include "ModelManager.h"
 
-#include "ModelManager.h"
+#include "PresetManager.h"
 #include "Settings.h"
 
 void ModelManager::ReadPreset() const
 {
-	ModelManager::GetSingleton()->ReadPreset(modelHolder->local);
+	PresetManager::GetSingleton()->ReadPreset(modelHolder->local);
 }
 
 void ModelManager::WritePreset() const
 {
-	ModelManager::GetSingleton()->WritePreset(modelHolder->local);
+	PresetManager::GetSingleton()->WritePreset(modelHolder->local);
 }
 
 void ModelManager::LogAction(std::string_view a_action)
 {
-	ModelManager::GetSingleton()->LogAction(a_action);
+	PresetManager::GetSingleton()->LogAction(a_action);
 }
 
 void ModelManager::ProcessButtonHeld(RE::INPUT_DEVICE a_device, std::uint32_t a_key, bool a_altKeyHeld) const
@@ -202,7 +202,7 @@ void ModelManager::CalculateLockAlignment(bool a_serialize)
 
 void ModelManager::TryAttachModel(const RE::NiPointer<RE::NiNode>& a_shivNode)
 {
-	const auto [modelPath, nodeName, modelData, isDagger] = ModelManager::GetSingleton()->GetModel();
+	const auto [modelPath, modelData, nodeName, isDagger] = PresetManager::GetSingleton()->GetModel();
 
 	if (!modelPath.empty()) {
 		typeDagger = isDagger;
@@ -260,7 +260,7 @@ void ModelManager::CullDagger(bool a_cull) const
 
 	// bethesda hates left handed players
 	// no stored left dagger in BipedAnim[kOneHandedDagger]
-    if (const auto current3D = RE::PlayerCharacter::GetSingleton()->GetCurrent3D()) {
+	if (const auto current3D = RE::PlayerCharacter::GetSingleton()->GetCurrent3D()) {
 		if (const auto node = current3D->GetObjectByName(daggerNodeName)) {
 			node->SetAppCulled(a_cull);
 		}
@@ -309,14 +309,14 @@ void ModelManager::ProcessModel(const RE::NiNodePtr& loadedNode)
 	}
 
 	// for calculating lock alignment later
-    GetMinimalEnclosingSphere(boundingSpheres);
+	GetMinimalEnclosingSphere(boundingSpheres);
 
 	objects.clear();
 }
 
 void ModelManager::ClearModels()
 {
-	ModelManager::GetSingleton()->Clear();
+	PresetManager::GetSingleton()->Clear();
 
 	RE::DetachNode(modelHolder);
 
