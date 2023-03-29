@@ -1,5 +1,6 @@
 #include "PresetManager.h"
 
+#include "ConditionParser.h"
 #include "Settings.h"
 
 RE::TESObjectWEAP* PresetManager::Dagger::IsDagger(RE::TESForm* a_form)
@@ -65,11 +66,22 @@ RE::TESObjectWEAP* PresetManager::Dagger::GetBest()
 	return best.first;
 }
 
-ModelOutput PresetManager::GetModel()
+Model::Output PresetManager::GetModel()
 {
-	ModelOutput output;
+	Model::Output output;
 
-	if (Settings::GetSingleton()->enableDaggerSwap) {
+	if (!modelVec.empty()) {
+		const auto player = RE::PlayerCharacter::GetSingleton();
+		for (std::uint32_t i = 0; i < modelVec.size(); i++) {
+			const auto& [path, data] = modelVec[i];
+			if (!data.conditions || data.conditions->IsTrue(player, player)) {
+				output.modelPath = path;
+				output.index = i;
+			}
+		}
+	}
+
+	if (output.modelPath.empty() && Settings::GetSingleton()->enableDaggerSwap) {
 		auto dagger = Dagger::GetEquipped();
 		if (dagger) {
 			output.nodeName = fmt::format("{}  ({:08X})", "Weapon", dagger->GetFormID());
@@ -79,21 +91,24 @@ ModelOutput PresetManager::GetModel()
 		}
 		if (dagger) {
 			output.modelPath = dagger->GetModel();
-			output.isDagger = true;
+			output.index = -1;
 		}
 	}
 
 	if (modelPath = output.modelPath; !modelPath.empty()) {
-		isDagger = output.isDagger;
+		modelVecIndex = output.index;
 
-		const auto& map = isDagger ? daggersMap : modelMap;
-		if (const auto it = map.find(modelPath); it != map.end()) {
-			output.modelData = it->second;
+		if (modelVecIndex == -1) {
+			if (const auto it = daggersMap.find(modelPath); it != daggersMap.end()) {
+				output.modelData = it->second;
+			}
+		} else {
+			output.modelData = modelVec[output.index].data;
 		}
 
 		if (output.modelData) {
 			presetPath = output.modelData->presetPath;
-		} else if (isDagger) {
+		} else if (modelVecIndex == -1) {
 			presetPath = Dagger::defaultPreset;
 		}
 		truncPresetPath = presetPath.substr(5);
@@ -138,7 +153,7 @@ void PresetManager::LoadPresets()
 
 		CSimpleIniA ini;
 		ini.SetUnicode();
-		ini.SetAllowKeyOnly();
+		ini.SetMultiKey();
 
 		if (const auto rc = ini.LoadFile(path.c_str()); rc < 0) {
 			logger::error("	couldn't read INI");
@@ -150,7 +165,8 @@ void PresetManager::LoadPresets()
 		sections.sort(CSimpleIniA::Entry::LoadOrder());
 
 		for (auto& [section, comment, keyOrder] : sections) {
-			RE::NiTransform transform{};
+			RE::NiTransform          transform{};
+			std::vector<std::string> conditionList{};
 
 			if (const auto values = ini.GetSection(section); values && !values->empty()) {
 				for (const auto& [key, value] : *values) {
@@ -169,17 +185,40 @@ void PresetManager::LoadPresets()
 
 							transform.rotate.SetEulerAnglesXYZ(RE::deg_to_rad(angleX), RE::deg_to_rad(angleY), RE::deg_to_rad(angleZ));
 						}
-					} else {
+					} else if (string::iequals(key.pItem, "Scale")) {
 						transform.scale = string::to_num<float>(value);
+					} else if (string::iequals(key.pItem, "Condition")) {
+						conditionList = string::split(value, "|");
 					}
 				}
+
 				if (auto splitSection = string::split(section, "|"); splitSection[0] == "DAGGER") {
-					daggersMap.insert_or_assign(splitSection[1], ModelData(path, transform));
+					DaggerData data;
+					data.presetPath = path;
+					if (transform.translate != RE::NiPoint3::Zero()) {
+						data.transform = transform;
+					}
+					daggersMap.insert_or_assign(splitSection[1], data);
 				} else {
-					daggersMap.insert_or_assign(splitSection[1], ModelData(path, transform));
+					ModelData data{};
+					data.path = splitSection[1];
+					data.data.presetPath = path;
+					if (transform.translate != RE::NiPoint3::Zero()) {
+						data.data.transform = transform;
+					}
+					data.data.conditions = ConditionParser::GetSingleton()->BuildCondition(conditionList);
+
+					modelVec.emplace_back(std::move(data));
 				}
 			}
 		}
+	}
+
+	// reverse modelVec according to each preset path but preserve entry order
+	if (modelVec.size() > 1) {
+		std::ranges::stable_sort(modelVec, [](const auto& a, const auto& b) {
+			return a.data.presetPath > b.data.presetPath;
+		});
 	}
 }
 
@@ -197,7 +236,7 @@ void PresetManager::ReadPreset(RE::NiTransform& a_transform) const
 	ini.LoadFile(presetPath.c_str());
 
 	std::string entry;
-	if (isDagger) {
+	if (modelVecIndex == -1) {
 		entry = std::string(daggerEntry) + modelPath;
 	} else {
 		entry = std::string(modelEntry) + modelPath;
@@ -231,12 +270,12 @@ void PresetManager::WritePreset(const RE::NiTransform& a_transform)
 
 	std::string entry;
 
-	if (isDagger) {
+	if (modelVecIndex == -1) {
 		entry = std::string(daggerEntry) + modelPath;
-		daggersMap.insert_or_assign(modelPath, ModelData(presetPath, a_transform));
+		daggersMap.insert_or_assign(modelPath, DaggerData(presetPath, a_transform));
 	} else {
 		entry = std::string(modelEntry) + modelPath;
-		modelMap.insert_or_assign(modelPath, ModelData(presetPath, a_transform));
+		modelVec[modelVecIndex].data.transform = a_transform;
 	}
 
 	const auto translate = fmt::format("{:.06f},{:.06f},{:.06f}", a_transform.translate.x, a_transform.translate.y, a_transform.translate.z);
@@ -256,5 +295,5 @@ void PresetManager::ClearCurrentData()
 	modelPath.clear();
 	presetPath.clear();
 	truncPresetPath.clear();
-	isDagger = false;
+	modelVecIndex = -1;
 }

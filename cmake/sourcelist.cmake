@@ -1,4 +1,5 @@
 set(sources ${sources}
+	src/ConditionParser.cpp
 	src/Hooks.cpp
 	src/ModelManager.cpp
 	src/PCH.cpp

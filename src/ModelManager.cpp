@@ -94,7 +94,7 @@ void ModelManager::ProcessButtonDown(RE::INPUT_DEVICE a_device, std::uint32_t a_
 			{
 				if (a_altKeyHeld) {
 					CalculateLockAlignment(false);
-					LogAction("Transforms recalculated");
+					LogAction("Recalculated transforms");
 				} else {
 					ReadPreset();
 					LogAction("Reloaded transforms from preset");
@@ -202,10 +202,10 @@ void ModelManager::CalculateLockAlignment(bool a_serialize)
 
 void ModelManager::TryAttachModel(const RE::NiPointer<RE::NiNode>& a_shivNode)
 {
-	const auto [modelPath, modelData, nodeName, isDagger] = PresetManager::GetSingleton()->GetModel();
+	const auto [modelPath, modelData, nodeName, modelIndex] = PresetManager::GetSingleton()->GetModel();
 
 	if (!modelPath.empty()) {
-		typeDagger = isDagger;
+		typeDagger = (modelIndex == -1);
 		daggerNodeName = nodeName;
 
 		RE::NiNodePtr                               loadedModel;
@@ -223,7 +223,7 @@ void ModelManager::TryAttachModel(const RE::NiPointer<RE::NiNode>& a_shivNode)
 	}
 }
 
-bool ModelManager::AttachModel(const RE::NiNodePtr& a_shivNode, const RE::NiNodePtr& a_loadedModel, const std::optional<ModelData>& a_modelData)
+bool ModelManager::AttachModel(const RE::NiNodePtr& a_shivNode, const RE::NiNodePtr& a_loadedModel, const std::optional<Model::Data>& a_modelData)
 {
 	// Hide vanilla shiv geometry
 	a_shivNode->CullGeometry(true);
@@ -232,8 +232,9 @@ bool ModelManager::AttachModel(const RE::NiNodePtr& a_shivNode, const RE::NiNode
 	ProcessModel(a_loadedModel);
 
 	if (modelHolder) {
-		if (a_modelData && a_modelData->transform.translate != RE::NiPoint3()) {
-			modelHolder->local = a_modelData->transform;
+		// Apply transform
+		if (a_modelData && a_modelData->transform && a_modelData->transform->translate != RE::NiPoint3()) {
+			modelHolder->local = *(a_modelData->transform);
 		} else {
 			CalculateLockAlignment(true);
 		}

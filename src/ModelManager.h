@@ -1,6 +1,9 @@
 #pragma once
 
-struct ModelData;
+namespace Model
+{
+	struct Data;
+}
 
 class ModelManager : public ISingleton<ModelManager>
 {
@@ -29,7 +32,7 @@ private:
 	void         CalculateLockAlignment(bool a_serialize);
 
 	void ProcessModel(const RE::NiNodePtr& loadedNode);
-	bool AttachModel(const RE::NiNodePtr& a_shivNode, const RE::NiNodePtr& a_loadedModel, const std::optional<ModelData>& a_modelData);
+	bool AttachModel(const RE::NiNodePtr& a_shivNode, const RE::NiNodePtr& a_loadedModel, const std::optional<Model::Data>& a_modelData);
 
 	void CullDagger(bool a_cull) const;
 

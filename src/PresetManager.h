@@ -1,23 +1,11 @@
 #pragma once
 
-struct ModelData
-{
-	std::string     presetPath;
-	RE::NiTransform transform;
-};
-
-struct ModelOutput
-{
-	std::string              modelPath;
-	std::optional<ModelData> modelData;
-	std::string              nodeName;
-	bool                     isDagger{ false };
-};
+#include "ModelData.h"
 
 class PresetManager : public ISingleton<PresetManager>
 {
 public:
-	ModelOutput GetModel();
+	Model::Output GetModel();
 
 	void LoadPresets();
 
@@ -41,13 +29,13 @@ private:
 	};
 
 	// members
-	StringMap<ModelData> daggersMap{};
-	StringMap<ModelData> modelMap{};
+	StringMap<DaggerData>  daggersMap{};
+	std::vector<ModelData> modelVec{};
 
-	std::string presetPath;
-	std::string truncPresetPath;
-	std::string modelPath;
-	bool        isDagger{ false };
+    std::string  presetPath;
+	std::string  truncPresetPath;
+	std::string  modelPath;
+	std::int32_t modelVecIndex{ -1 };
 
 	static inline constexpr std::string_view daggerEntry{ "DAGGER|" };
 	static inline constexpr std::string_view modelEntry{ "MODEL|" };
