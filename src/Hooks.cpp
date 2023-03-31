@@ -1,11 +1,14 @@
 #include "Hooks.h"
 #include "ModelManager.h"
+#include "PresetManager.h"
 #include "Settings.h"
 
 namespace Hooks
 {
 	static bool          isAltKeyHeld{ false };
 	static std::uint32_t numTimesTogglePressed{ 0 };
+
+	static std::once_flag loadConditions;
 
 	// Init
 	struct Init3DElements
@@ -15,6 +18,11 @@ namespace Hooks
 			func(a_this);
 
 			if (!a_this->init3DElements) {
+			    std::call_once(loadConditions, []() {
+					PresetManager::GetSingleton()->LoadConditions();
+					logger::info("{:*^30}", "GAME");
+				});
+
 				const auto lockModelHandle = static_cast<RE::BSResource::ModelHandle*>(a_this->lockDBHandle);
 				const auto lockModel = lockModelHandle ? lockModelHandle->data : RE::NiPointer<RE::NiNode>();
 
@@ -117,6 +125,8 @@ namespace Hooks
 
 	void Install()
 	{
+		logger::info("Installed lockpicking menu hooks");
+
 		// nop game's { a_this->init3DElements = true; }
 		REL::Relocation<std::uintptr_t> init3DElements{ RELOCATION_ID(51081, 51960), OFFSET(0x4F4, 0x4B2) };
 		REL::safe_write(init3DElements.address(), REL::NOP7, sizeof(REL::NOP7));

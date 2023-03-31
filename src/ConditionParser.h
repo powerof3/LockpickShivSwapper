@@ -9,7 +9,7 @@ using PARAMS = std::pair<std::optional<PARAM_TYPE>, std::optional<PARAM_TYPE>>;
 class ConditionParser : public ISingleton<ConditionParser>
 {
 public:
-	auto BuildCondition(const std::vector<std::string>& a_conditionList)->std::unique_ptr<RE::TESCondition>;
+	auto BuildCondition(const std::vector<std::string>& a_conditionList) -> std::unique_ptr<RE::TESCondition>;
 
 private:
 	union VOID_PARAM
@@ -20,8 +20,9 @@ private:
 		RE::TESForm* ptr;
 	};
 
-	static PARAMS GetFuncType(FUNC_ID a_funcID);
-	bool          ParseVoidParam(const std::string& a_str, VOID_PARAM& a_param, PARAM_TYPE a_type) const;
+	static PARAMS       GetFuncType(FUNC_ID a_funcID);
+	static RE::TESForm* LookupForm(const std::string& a_str);
+	bool                ParseVoidParam(const std::string& a_str, VOID_PARAM& a_param, PARAM_TYPE a_type) const;
 
 	// members
 	StringMap<std::uint32_t> funcIDs{

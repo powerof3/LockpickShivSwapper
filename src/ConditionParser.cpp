@@ -558,6 +558,33 @@ PARAMS ConditionParser::GetFuncType(FUNC_ID a_funcID)
 	return paramPair;
 }
 
+RE::TESForm* ConditionParser::LookupForm(const std::string& a_str)
+{
+	auto formOrEditorID = dist::get_record(a_str);
+	if (auto formid_pair = std::get_if<dist::formid_pair>(&formOrEditorID)) {
+		if (auto& [formID, modName] = *formid_pair; formID) {
+			const auto [mergedModName, mergedFormID] = g_mergeMapperInterface->GetNewFormID(modName.value_or("").c_str(), *formID);
+			if (mergedFormID != *formID) {
+				formID.emplace(mergedFormID);
+			}
+			const std::string mergedModString{ mergedModName };
+			if (modName && !mergedModString.empty() && *modName != mergedModString) {
+				modName.emplace(mergedModName);
+			}
+			if (modName) {
+				return RE::TESDataHandler::GetSingleton()->LookupForm(*formID, *modName);
+			} else {
+				return RE::TESForm::LookupByID(*formID);
+			}
+		}
+	} else {
+		const auto& editorID = std::get<std::string>(formOrEditorID);
+		return RE::TESForm::LookupByEditorID(editorID);
+	}
+
+	return nullptr;
+}
+
 bool ConditionParser::ParseVoidParam(const std::string& a_str, VOID_PARAM& a_param, PARAM_TYPE a_type) const
 {
 	switch (a_type) {
@@ -677,7 +704,6 @@ bool ConditionParser::ParseVoidParam(const std::string& a_str, VOID_PARAM& a_par
 	case PARAM_TYPE::kWorldOrList:
 	case PARAM_TYPE::kObject:
 	case PARAM_TYPE::kRegion:
-	case PARAM_TYPE::kKeyword:
 	case PARAM_TYPE::kShout:
 	case PARAM_TYPE::kLocation:
 	case PARAM_TYPE::kRefType:
@@ -700,28 +726,26 @@ bool ConditionParser::ParseVoidParam(const std::string& a_str, VOID_PARAM& a_par
 			if (string::icontains(a_str, "Player")) {
 				a_param.ptr = RE::PlayerCharacter::GetSingleton();
 			} else {
-				auto formOrEditorID = dist::get_record(a_str);
-				if (auto formid_pair = std::get_if<dist::formid_pair>(&formOrEditorID)) {
-					if (auto& [formID, modName] = *formid_pair; formID) {
-						const auto [mergedModName, mergedFormID] = g_mergeMapperInterface->GetNewFormID(modName.value_or("").c_str(), *formID);
-						if (mergedFormID != *formID) {
-							formID.emplace(mergedFormID);
-						}
-						const std::string mergedModString{ mergedModName };
-						if (modName && !mergedModString.empty() && *modName != mergedModString) {
-							modName.emplace(mergedModName);
-						}
-						if (modName) {
-							a_param.ptr = RE::TESDataHandler::GetSingleton()->LookupForm(*formID, *modName);
-						} else {
-							a_param.ptr = RE::TESForm::LookupByID(*formID);
-						}
-					}
-				} else {
-					const auto& editorID = std::get<std::string>(formOrEditorID);
-					a_param.ptr = RE::TESForm::LookupByEditorID(editorID);
-				}
+				a_param.ptr = LookupForm(a_str);
 			}
+		}
+		break;
+	case PARAM_TYPE::kKeyword:
+		{
+			switch (dist::get_record_type(a_str)) {
+			case dist::kEditorID:
+				{
+					const auto& keywordArray = RE::TESDataHandler::GetSingleton()->GetFormArray<RE::BGSKeyword>();
+                    const auto  it = std::ranges::find_if(keywordArray, [&](const auto& keyword) { return keyword->formEditorID == a_str.c_str(); });
+					if (it != keywordArray.end()) {
+					    a_param.ptr = *it;
+					}
+				}
+				break;
+			default:
+				a_param.ptr = LookupForm(a_str);
+				break;
+            }
 		}
 		break;
 	default:
@@ -740,7 +764,7 @@ auto ConditionParser::BuildCondition(const std::vector<std::string>& a_condition
 	for (auto& condition : a_conditionList) {
 		srell::cmatch match;
 		if (!srell::regex_match(condition.c_str(), match, condRegex)) {
-		    continue;
+			continue;
 		}
 
 		auto& functionID = match[1];
@@ -756,7 +780,7 @@ auto ConditionParser::BuildCondition(const std::vector<std::string>& a_condition
 		if (auto it = funcIDs.find(functionID.str()); it != funcIDs.end()) {
 			condData.functionData.function = static_cast<FUNC_ID>(it->second);
 		} else {
-		    continue;
+			continue;
 		}
 		auto [param1Type, param2Type] = GetFuncType(*condData.functionData.function);
 		// param1
@@ -815,7 +839,7 @@ auto ConditionParser::BuildCondition(const std::vector<std::string>& a_condition
 			newNode->next = nullptr;
 
 			auto* current = tescondition->head;
-		    if (tescondition->head == nullptr) {
+			if (tescondition->head == nullptr) {
 				tescondition->head = newNode;
 			} else {
 				while (current->next != nullptr) {

@@ -8,6 +8,7 @@ public:
 	Model::Output GetModel();
 
 	void LoadPresets();
+	void LoadConditions();
 
 	void ReadPreset(RE::NiTransform& a_transform) const;
 	void WritePreset(const RE::NiTransform& a_transform);

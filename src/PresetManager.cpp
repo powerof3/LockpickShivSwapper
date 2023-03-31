@@ -206,8 +206,9 @@ void PresetManager::LoadPresets()
 					if (transform.translate != RE::NiPoint3::Zero()) {
 						data.data.transform = transform;
 					}
-					data.data.conditions = ConditionParser::GetSingleton()->BuildCondition(conditionList);
-
+					if (!conditionList.empty()) {
+						data.data.rawConditions = conditionList;
+					}
 					modelVec.emplace_back(std::move(data));
 				}
 			}
@@ -220,6 +221,18 @@ void PresetManager::LoadPresets()
 			return a.data.presetPath > b.data.presetPath;
 		});
 	}
+}
+
+void PresetManager::LoadConditions()
+{
+	for (auto& [path, data] : modelVec) {
+		if (!data.rawConditions.empty()) {
+			data.conditions = ConditionParser::GetSingleton()->BuildCondition(data.rawConditions);
+			data.rawConditions.clear();
+		}
+	}
+
+	logger::info("Loaded conditions");
 }
 
 void PresetManager::LogAction(std::string_view a_action) const

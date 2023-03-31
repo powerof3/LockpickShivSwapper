@@ -10,6 +10,7 @@ namespace Model
 
 	struct ConditionalData : Data
 	{
+		std::vector<std::string>          rawConditions;
 		std::unique_ptr<RE::TESCondition> conditions;
 	};
 

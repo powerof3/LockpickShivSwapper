@@ -8,6 +8,8 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_message)
 	case SKSE::MessagingInterface::kPostLoad:
 		{
 			Settings::GetSingleton()->LoadSettings();
+			logger::info("{:*^30}", "PRESETS");
+			PresetManager::GetSingleton()->LoadPresets();
 			logger::info("{:*^30}", "HOOKS");
 			Hooks::Install();
 		}
@@ -22,13 +24,6 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_message)
 			} else {
 				logger::info("MergeMapper not detected");
 			}
-			logger::info("{:*^30}", "GAME");
-		}
-		break;
-	case SKSE::MessagingInterface::kDataLoaded:
-		{
-			logger::info("{:*^30}", "PRESETS");
-			PresetManager::GetSingleton()->LoadPresets();
 		}
 		break;
 	default:
