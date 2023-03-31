@@ -221,6 +221,9 @@ void PresetManager::LoadPresets()
 			return a.data.presetPath > b.data.presetPath;
 		});
 	}
+
+	logger::info("{} dagger presets", daggersMap.size());
+	logger::info("{} model presets", modelVec.size());
 }
 
 void PresetManager::LoadConditions()
@@ -231,8 +234,6 @@ void PresetManager::LoadConditions()
 			data.rawConditions.clear();
 		}
 	}
-
-	logger::info("Loaded conditions");
 }
 
 void PresetManager::LogAction(std::string_view a_action) const
