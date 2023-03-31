@@ -19,9 +19,10 @@ public:
 	void LoadSettings();
 
 	// members
-	bool enableDaggerSwap{ true };
-	bool useHighestAvailableDagger{ true };
-	bool hideEquippedDagger{ true };
+	bool                     enableDaggerSwap{ true };
+	bool                     useHighestAvailableDagger{ true };
+	bool                     hideEquippedDagger{ true };
+	std::vector<std::string> blacklistedKeywords{};
 
 	struct
 	{

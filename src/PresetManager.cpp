@@ -7,7 +7,13 @@ RE::TESObjectWEAP* PresetManager::Dagger::IsDagger(RE::TESForm* a_form)
 {
 	const auto weap = a_form ? a_form->As<RE::TESObjectWEAP>() : nullptr;
 	if (weap && weap->IsOneHandedDagger() && weap->GetPlayable()) {
-		return weap;
+		static auto& blacklistedKeywords = Settings::GetSingleton()->blacklistedKeywords;
+		for (const auto& keyword : blacklistedKeywords) {
+			if (weap->HasKeywordString(keyword)) {
+				return nullptr;
+			}
+		}
+	    return weap;
 	}
 	return nullptr;
 }
