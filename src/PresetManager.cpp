@@ -142,6 +142,7 @@ void PresetManager::LoadPresets()
 	}
 
 	std::ranges::sort(configs);
+	// load DefaultPreset before others
 	if (const auto it = std::ranges::find(configs, Dagger::defaultPreset); it != configs.end()) {
 		std::rotate(configs.begin(), it, it + 1);
 	}
