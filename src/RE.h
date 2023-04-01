@@ -23,7 +23,7 @@ namespace RE
 	void AttachNode(const NiNodePtr& a_root, const NiPointer<T>& a_obj)
 	{
 		if (TaskQueueInterface::ShouldUseTaskQueue()) {
-            TaskQueueInterface::GetSingleton()->QueueNodeAttach(a_obj.get(), a_root.get());
+			TaskQueueInterface::GetSingleton()->QueueNodeAttach(a_obj.get(), a_root.get());
 		} else {
 			a_root->AttachChild(a_obj.get());
 		}
@@ -31,11 +31,13 @@ namespace RE
 
 	inline void DetachNode(NiNodePtr& a_obj)
 	{
-		if (TaskQueueInterface::ShouldUseTaskQueue()) {
-            TaskQueueInterface::GetSingleton()->QueueNodeDetach(a_obj.get());
-		} else {
-			if (a_obj->parent) {
-				a_obj->parent->AttachChild(a_obj.get());
+		if (a_obj) {
+			if (TaskQueueInterface::ShouldUseTaskQueue()) {
+				TaskQueueInterface::GetSingleton()->QueueNodeDetach(a_obj.get());
+			} else {
+				if (a_obj->parent) {
+					a_obj->parent->AttachChild(a_obj.get());
+				}
 			}
 		}
 		a_obj.reset();
