@@ -30,14 +30,13 @@ RE::TESObjectWEAP* PresetManager::Dagger::GetRandom()
 
 	if (!initialized) {
 		StringSet tempDaggerModels;
-	    const auto& weaponArray = RE::TESDataHandler::GetSingleton()->GetFormArray<RE::TESObjectWEAP>();
-	    for (const auto& weapon : weaponArray) {
+	    for (const auto& weapon : RE::TESDataHandler::GetSingleton()->GetFormArray<RE::TESObjectWEAP>()) {
 			if (weapon->IsOneHandedDagger() && weapon->GetPlayable() && !tempDaggerModels.contains(weapon->GetModel())) {
 				tempDaggerModels.emplace(weapon->GetModel());
 			    daggers.emplace_back(weapon);
 			}
 		}
-		initialized = true;
+	    initialized = true;
 	}
 
 	if (initialized) {
