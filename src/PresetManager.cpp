@@ -13,19 +13,38 @@ RE::TESObjectWEAP* PresetManager::Dagger::IsDagger(RE::TESForm* a_form)
 				return nullptr;
 			}
 		}
-	    return weap;
+		return weap;
 	}
 	return nullptr;
 }
 
 RE::TESObjectWEAP* PresetManager::Dagger::GetRandom()
 {
-	static StringSet tempDaggers;
-	for (const auto& weapon : RE::TESDataHandler::GetSingleton()->GetFormArray<RE::TESObjectWEAP>()) {
-		if (weapon->IsOneHandedDagger() && !weapon->IsBound() && !tempDaggers.contains(weapon->GetModel())) {
-			tempDaggers.emplace(weapon->GetModel());
-			return weapon;
+	if (!Settings::GetSingleton()->useRandomDagger) {
+		return nullptr;
+	}
+
+	static std::vector<RE::TESObjectWEAP*> daggers;
+	static bool                            initialized = false;
+	static std::size_t                     index{ 0 };
+
+	if (!initialized) {
+		StringSet tempDaggerModels;
+	    const auto& weaponArray = RE::TESDataHandler::GetSingleton()->GetFormArray<RE::TESObjectWEAP>();
+	    for (const auto& weapon : weaponArray) {
+			if (weapon->IsOneHandedDagger() && weapon->GetPlayable() && !tempDaggerModels.contains(weapon->GetModel())) {
+				tempDaggerModels.emplace(weapon->GetModel());
+			    daggers.emplace_back(weapon);
+			}
 		}
+		initialized = true;
+	}
+
+	if (initialized) {
+		if (index == daggers.size()) {
+			index = 0;
+		}
+		return daggers[index++];
 	}
 	return nullptr;
 }
@@ -88,9 +107,12 @@ Model::Output PresetManager::GetModel()
 	}
 
 	if (output.modelPath.empty() && Settings::GetSingleton()->enableDaggerSwap) {
-		auto dagger = Dagger::GetEquipped();
-		if (dagger) {
-			output.nodeName = fmt::format("{}  ({:08X})", "Weapon", dagger->GetFormID());
+		auto dagger = Dagger::GetRandom();
+		if (!dagger) {
+			dagger = Dagger::GetEquipped();
+			if (dagger) {
+				output.nodeName = fmt::format("{}  ({:08X})", "Weapon", dagger->GetFormID());
+			}
 		}
 		if (!dagger) {
 			dagger = Dagger::GetBest();

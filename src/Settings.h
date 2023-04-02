@@ -22,6 +22,7 @@ public:
 	bool                     enableDaggerSwap{ true };
 	bool                     useHighestAvailableDagger{ true };
 	bool                     hideEquippedDagger{ true };
+	bool                     useRandomDagger{ true };
 	std::vector<std::string> blacklistedKeywords{};
 
 	struct
